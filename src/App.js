@@ -17,6 +17,7 @@ import {
   TrendingDown,
   ChartLine,
   Gauge,
+  AlertTriangle,
   MessageCircle,
 } from "lucide-react";
 import { io } from "socket.io-client";
@@ -24,6 +25,64 @@ import { io } from "socket.io-client";
 // Import comments from transactions file
 import commentsData from "./transactions";
 import { CommentsSection } from "./CommentsSection";
+
+// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import tradingData from "./conversion";
+
+const CustomAlert = ({ icon: Icon, title, children, variant }) => {
+  const getVariantStyles = () => {
+    switch (variant) {
+      case "warning":
+        return "border-yellow-600/20 bg-yellow-600/10";
+      case "info":
+        return "border-blue-600/20 bg-blue-600/10";
+      default:
+        return "border-gray-600/20 bg-gray-600/10";
+    }
+  };
+
+  return (
+    <div className={`p-4 rounded-lg border ${getVariantStyles()}`}>
+      <div className="flex items-start">
+        <Icon className={`h-5 w-5 ${variant === "warning" ? "text-yellow-400" : "text-blue-400"} mt-0.5`} />
+        <div className="ml-3 w-full">
+          <h4 className={`text-base font-medium ${variant === "warning" ? "text-yellow-400" : "text-blue-400"}`}>
+            {title}
+          </h4>
+          <div className="mt-2 text-gray-300 text-sm">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const TradingAdviceSection = () => (
+  <div className="mb-8 bg-gray-800 p-4 rounded-lg">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-lg font-semibold text-white">Trading Advice</h3>
+      <AlertTriangle className="h-5 w-5 text-yellow-400" />
+    </div>
+    <div className="space-y-4">
+      <CustomAlert 
+        icon={TrendingDown} 
+        title="Market Variation" 
+        variant="warning"
+      >
+        {tradingData.variation}
+      </CustomAlert>
+      
+      <CustomAlert 
+        icon={TrendingUp} 
+        title="Trading Recommendation" 
+        variant="info"
+      >
+        {tradingData.advice}
+      </CustomAlert>
+    </div>
+  </div>
+);
 
 const ForexDashboard = () => {
   // États pour les différentes données
@@ -150,6 +209,7 @@ const ForexDashboard = () => {
         </div>
         <nav className="space-y-2">
           {[
+            { icon: AlertTriangle, text: "Trading Advice", section: "trading-advice" },
             { icon: Gauge, text: "Indicators", section: "indicators" },
             { icon: ChartLine, text: "Real-Time", section: "real-time-chart" },
             { icon: ChartLine, text: "Chart", section: "chart" },
@@ -170,6 +230,11 @@ const ForexDashboard = () => {
 
       {/* Main Content */}
       <div className="ml-64 flex-1 p-8">
+        {/* Trading Advice Section */}
+        <section id="trading-advice">
+          <TradingAdviceSection />
+        </section>
+
         {/* Indicators Section */}
         <section id="indicators" className="mb-8">
           <div className="flex items-center justify-between mb-4">
